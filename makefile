@@ -1,5 +1,6 @@
+FLAGS 	= -DUNICODE
 INCLUDE = include
-SOURCE = src
+SOURCE 	= src
 
 all:
-	g++ $(wildcard $(SOURCE)/*.cpp) -o main -I$(INCLUDE)
+	g++ $(wildcard $(SOURCE)/*.cpp) -o main -I$(INCLUDE) $(FLAGS)
