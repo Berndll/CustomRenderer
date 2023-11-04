@@ -2,46 +2,16 @@
 #include "Window.hpp"
 
 int main() {
-    std::cout << "Creating Window\n";
+    Window window;
 
-    Window* pWindow = new Window();
+    while (window.ProcessMessages()) {
+        window.drawLine(0, 0, 639, 479, 0xFF0000);
+        window.drawPixel(10, 10, 0xFF0000);
+        window.drawRect(0, 0, 200, 200, 0x0000FF);
 
-    bool running = true;
-
-    HDC hdc = GetDC(pWindow->getWindow());
-
-    uint32_t* pixel = (uint32_t*)pWindow->getMemory();
-        for (int i = 0; i < 640 * 480 - 100; ++i)
-        pixel[i] = 0x0000FF;
-    pixel = (uint32_t*)pWindow->getMemory();
-
-    while (running) {
-        if (!pWindow->ProcessMessages()) {
-            std::cout << "Closing Window\n";
-            running = false;
-        }
-
-        /*
-        // for (int i = 0; i < width * height; ++i) {
-        //     if (val) pixel[i] = 0x0000FF;
-        //     else     pixel[i] = 0xFF0000;
-
-        //     val = i%2;
-        // }
-
-        // Copy from memory to window
-        */
-        pixel = (uint32_t*)pWindow->getMemory();
-        for (int i = 0; i < 640 * 480; ++i) {
-            pixel[i] = 0xFF0000;
-        }
-        
-        pWindow->draw();
-
+        window.update();
         Sleep(10); // Lower FPS
     }
-
-    delete pWindow;
 
     return 0;
 }

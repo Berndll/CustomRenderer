@@ -3,6 +3,9 @@
 // https://www.youtube.com/watch?v=Kx5CN-V6FvQ
 // https://www.youtube.com/watch?v=vEFpaJdKcYU
 
+// #define uint32_t unsigned int
+
+#include <iostream>
 #include <gdiplus.h>
 #include <windows.h>
 
@@ -17,24 +20,25 @@ public:
 
     bool ProcessMessages();
 
-    void draw();
+    void update();
 
-    const HWND getWindow() { return _hWnd; }
-
-    BITMAPINFO getBitmapInfo() { return _bitmap_info; }
-    long getClientWidth()   { return _clientWidth;  }
-    long getClientHeight()  { return _clientHeight; }
+    int getWidth()   { return _width;  }
+    int getHeight()  { return _height; }
     PVOID getMemory()  { return _memory; }
 
-    BITMAPINFO _bitmap_info;
+    void clearScreen(uint32_t color);
+    void drawPixel(int x, int y, uint32_t color);
+    void drawLine(int x0, int y0, int x1, int y1, uint32_t color);
+    void drawRect(int x0, int y0, int x1, int y1, uint32_t color);
 
 private:
     HINSTANCE _hInstance;
     HWND _hWnd;
-
-    long _width = 640, _height = 480;
-    long _clientWidth, _clientHeight;
+    BITMAPINFO _bitmap_info;
     PVOID _memory;
+
+    int _width = 640, _height = 480;
+    long _clientWidth, _clientHeight;
 
     void bitmapinfo();
 };

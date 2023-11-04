@@ -14,8 +14,7 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 }
 
 Window::Window() : _hInstance(GetModuleHandle(nullptr)) {
-    // Draw draw(_hWnd, getClientWidth(), getClientHeight());
-    // _draw = draw;
+    std::cout << "Creating Window\n";
 
     const auto CLASS_NAME = L"My Window Class";
 
@@ -74,6 +73,8 @@ Window::~Window() {
     const wchar_t* CLASS_NAME = L"My Window Class";
 
     UnregisterClass(CLASS_NAME, _hInstance);
+
+    std::cout << "Closing Window\n";
 }
 
 bool Window::ProcessMessages() {
@@ -94,13 +95,13 @@ void Window::bitmapinfo() {
     _bitmap_info.bmiHeader.biSize = sizeof(_bitmap_info.bmiHeader);
     _bitmap_info.bmiHeader.biWidth = _clientWidth;
     // Negative biHeight makes top left as the coordinate system origin. Otherwise it's bottom left.
-    _bitmap_info.bmiHeader.biHeight = _clientHeight;
+    _bitmap_info.bmiHeader.biHeight = -_clientHeight;
     _bitmap_info.bmiHeader.biPlanes = 1;
     _bitmap_info.bmiHeader.biBitCount = 32;
     _bitmap_info.bmiHeader.biCompression = BI_RGB;
 }
 
-void Window::draw() {
+void Window::update() {
     StretchDIBits(
         GetDC(_hWnd),    // draw on this window
         0,      // start
@@ -116,4 +117,39 @@ void Window::draw() {
         DIB_RGB_COLORS, 
         SRCCOPY
     );
+}
+
+void Window::clearScreen(uint32_t color) {
+    uint32_t* pixel = (uint32_t*)_memory;
+    for (int i = 0; i < _width * _height; ++i)
+        pixel[i] = color;
+}
+
+void Window::drawPixel(int x, int y, uint32_t color) {
+    uint32_t* pixel = (uint32_t*)_memory;
+    pixel[_clientWidth * y + x] = color;
+}
+
+void Window::drawLine(int x0, int y0, int x1, int y1, uint32_t color) {
+    auto abs = [](int n) { return (n > 0) ? n : -n; };
+
+    int dx =  abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+    int dy = -abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+    int err = dx + dy, e2; /* error value e_xy */
+
+    while (1) {
+        drawPixel(x0, y0, color);
+        if (x0 == x1 && y1 == y0) 
+            break;
+        e2 = 2 * err;
+        if (e2 > dy) { err += dy; x0 += sx; } /* e_xy+e_x > 0 */
+        if (e2 < dx) { err += dx; y0 += sy; } /* e_xy+e_y < 0 */
+    }
+}
+
+void Window::drawRect(int x0, int y0, int x1, int y1, uint32_t color) {
+    drawLine(x0, y0, x0, y1, color);
+    drawLine(x0, y0, x1, y0, color);
+    drawLine(x0, y1, x1, y1, color);
+    drawLine(x1, y0, x1, y1, color);
 }
