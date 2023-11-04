@@ -6,8 +6,6 @@
 #include <gdiplus.h>
 #include <windows.h>
 
-#include "Draw.hpp"
-
 LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 class Window{
