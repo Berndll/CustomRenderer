@@ -1,6 +1,7 @@
-FLAGS 	= -DUNICODE
-INCLUDE = include
-SOURCE 	= src
+DEFINE 		= UNICODE
+INCLUDE 	= include
+LIBRARIES 	= gdi32
+SOURCE 		= src
 
 all:
-	g++ $(wildcard $(SOURCE)/*.cpp) -o main -I$(INCLUDE) $(FLAGS)
+	g++ $(wildcard $(SOURCE)/*.cpp) -o main -I$(INCLUDE) -l$(LIBRARIES) -D$(DEFINE)

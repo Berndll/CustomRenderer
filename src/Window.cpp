@@ -1,7 +1,5 @@
 #include "Window.hpp"
 
-// https://www.youtube.com/watch?v=Kx5CN-V6FvQ
-
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
     case WM_CLOSE: // Close-Button
@@ -16,6 +14,9 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 }
 
 Window::Window() : _hInstance(GetModuleHandle(nullptr)) {
+    // Draw draw(_hWnd, getClientWidth(), getClientHeight());
+    // _draw = draw;
+
     const auto CLASS_NAME = L"My Window Class";
 
     WNDCLASS wndClass = {};
@@ -29,14 +30,25 @@ Window::Window() : _hInstance(GetModuleHandle(nullptr)) {
 
     DWORD style = WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU;
 
-    int width = 640;
-    int height = 480;
-
     RECT rect;
     rect.left = 250;
     rect.top = 250;
-    rect.right = rect.left + width;
-    rect.bottom = rect.top + height;
+    rect.right = rect.left + _width;
+    rect.bottom = rect.top + _height;
+
+    _clientWidth  = rect.right  - rect.left;
+    _clientHeight = rect.bottom - rect.top;
+
+    // Allocate Memory
+    _memory = VirtualAlloc(
+        0,
+        _clientWidth * _clientHeight * sizeof(uint32_t), 
+        MEM_RESERVE | MEM_COMMIT,
+        PAGE_READWRITE
+    );
+
+    // Bitmap info
+    bitmapinfo();
 
     AdjustWindowRect(&rect, style, false);  // Adjusts to use canvas size not window size
 
@@ -47,8 +59,8 @@ Window::Window() : _hInstance(GetModuleHandle(nullptr)) {
         style,
         rect.left,
         rect.top,
-        rect.right - rect.left,
-        rect.bottom - rect.top,
+        _clientWidth,
+        _clientHeight,
         NULL,
         NULL,
         _hInstance,
@@ -76,4 +88,32 @@ bool Window::ProcessMessages() {
     }
 
     return true;
+}
+
+void Window::bitmapinfo() {
+    _bitmap_info.bmiHeader.biSize = sizeof(_bitmap_info.bmiHeader);
+    _bitmap_info.bmiHeader.biWidth = _clientWidth;
+    // Negative biHeight makes top left as the coordinate system origin. Otherwise it's bottom left.
+    _bitmap_info.bmiHeader.biHeight = _clientHeight;
+    _bitmap_info.bmiHeader.biPlanes = 1;
+    _bitmap_info.bmiHeader.biBitCount = 32;
+    _bitmap_info.bmiHeader.biCompression = BI_RGB;
+}
+
+void Window::draw() {
+    StretchDIBits(
+        GetDC(_hWnd),    // draw on this window
+        0,      // start
+        0,      // start
+        _clientWidth,    // size
+        _clientHeight,   // size
+        0, 
+        0, 
+        _clientWidth, 
+        _clientHeight, 
+        _memory, // pixel data
+        &_bitmap_info, // how to interpret memory
+        DIB_RGB_COLORS, 
+        SRCCOPY
+    );
 }
