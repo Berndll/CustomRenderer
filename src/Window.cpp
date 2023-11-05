@@ -1,6 +1,14 @@
 #include "Window.hpp"
 
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+    static bool size_changed = true;
+    if ( uMsg == WM_SIZE ) {
+        size_changed = true;
+    } else if ( size_changed ) {
+        PostMessage( hWnd, WM_SIZE, wParam, lParam );
+        size_changed = false;
+    }
+
     switch (uMsg) {
     case WM_CLOSE: // Close-Button
         DestroyWindow(hWnd);
@@ -65,6 +73,11 @@ Window::Window() : _hInstance(GetModuleHandle(nullptr)) {
         _hInstance,
         NULL
     );
+
+    // RECT rect2;
+    // GetClientRect( _hWnd, &rect2 );
+    // auto w = rect2.right - rect2.left;
+    // std::cout << "w: " << w << " | _width: " << _width << std::endl;
     
     ShowWindow(_hWnd, SW_SHOW);
 }
@@ -81,11 +94,35 @@ bool Window::ProcessMessages() {
     MSG msg = {};
 
     while (PeekMessage(&msg, nullptr, 0u, 0u, PM_REMOVE)) {
-        if (msg.message == WM_QUIT) {
+        switch (msg.message) {
+        case WM_QUIT: 
             return false;
+        case WM_SIZE:
+        break;
+            std::cout << "Changed window size\n";
+
+            RECT rect;
+            GetClientRect(_hWnd, &rect);
+            _clientWidth = rect.right - rect.left;
+            _clientHeight = rect.bottom - rect.top;
+
+            if (_memory)
+                VirtualFree(_memory, 0, MEM_RELEASE);
+
+            _memory = VirtualAlloc(
+                0,
+                _clientWidth * _clientHeight * sizeof(uint32_t), 
+                MEM_RESERVE | MEM_COMMIT,
+                PAGE_READWRITE
+            );
+
+            bitmapinfo();
+            break;
+
+        default:
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
         }
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
     }
 
     return true;
@@ -152,4 +189,32 @@ void Window::drawRect(int x0, int y0, int x1, int y1, uint32_t color) {
     drawLine(x0, y0, x1, y0, color);
     drawLine(x0, y1, x1, y1, color);
     drawLine(x1, y0, x1, y1, color);
+}
+
+void Window::drawPolygon(std::vector<std::pair<int, int>> points, uint32_t color) {
+    for (int i = 0; i < points.size() - 1; ++i)
+        drawLine(
+            points.at(i).first,   points.at(i).second, 
+            points.at(i+1).first, points.at(i+1).second, 
+            color
+        );
+    drawLine(
+        points.at(0).first,  points.at(0).second, 
+        points.back().first, points.back().second, 
+        color
+    );
+}
+
+void Window::drawPolygon(std::vector<std::pair<float, float>> points, uint32_t color) {
+    for (int i = 0; i < points.size() - 1; ++i)
+        drawLine(
+            points.at(i).first,   points.at(i).second, 
+            points.at(i+1).first, points.at(i+1).second, 
+            color
+        );
+    drawLine(
+        points.at(0).first,  points.at(0).second, 
+        points.back().first, points.back().second, 
+        color
+    );
 }
