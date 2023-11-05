@@ -62,7 +62,7 @@ Window::Window() : _hInstance(GetModuleHandle(nullptr)) {
     _hWnd = CreateWindowEx(
         0,
         CLASS_NAME,
-        L"Title",
+        L"Renderer",
         style,
         rect.left,
         rect.top,
@@ -190,7 +190,7 @@ void Window::drawRect(int x0, int y0, int x1, int y1, uint32_t color) {
     drawLine(x0, y1, x1, y1, color);
     drawLine(x1, y0, x1, y1, color);
 }
-
+/*
 void Window::drawPolygon(std::vector<std::pair<int, int>> points, uint32_t color) {
     for (int i = 0; i < points.size() - 1; ++i)
         drawLine(
@@ -205,7 +205,7 @@ void Window::drawPolygon(std::vector<std::pair<int, int>> points, uint32_t color
     );
 }
 
-void Window::drawPolygon(std::vector<std::pair<float, float>> points, uint32_t color) {
+void Window::drawPolygon(std::vector<std::pair<double, double>> points, uint32_t color) {
     for (int i = 0; i < points.size() - 1; ++i)
         drawLine(
             points.at(i).first,   points.at(i).second, 
@@ -215,6 +215,21 @@ void Window::drawPolygon(std::vector<std::pair<float, float>> points, uint32_t c
     drawLine(
         points.at(0).first,  points.at(0).second, 
         points.back().first, points.back().second, 
+        color
+    );
+}
+*/
+void Window::drawPolygon(std::vector<Matrix<double>> points, uint32_t color) {
+    for (int i = 0; i < points.size() - 1; ++i) {
+        drawLine(
+            points.at(i).at(0,0),   points.at(i).at(1,0),
+            points.at(i+1).at(0,0), points.at(i+1).at(1,0),
+            color
+        );
+    }
+    drawLine(
+        points.at(0).at(0,0),  points.at(0).at(1,0),
+        points.back().at(0,0), points.back().at(1,0),
         color
     );
 }
