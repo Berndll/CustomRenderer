@@ -10,7 +10,7 @@
 #include <windows.h>
 
 
-#include "Matrix.hpp"
+#include "Matrix2D.hpp"
 
 LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -35,7 +35,7 @@ public:
     void drawRect(int x0, int y0, int x1, int y1, uint32_t color);
     // void drawPolygon(std::vector<std::pair<int, int>> points, uint32_t color);
     // void drawPolygon(std::vector<std::pair<double, double>> points, uint32_t color);
-    void drawPolygon(std::vector<Matrix<double>> points, uint32_t color);
+    void drawPolygon(std::vector<Matrix2D<double>> points, uint32_t color);
 
 private:
     HINSTANCE _hInstance;

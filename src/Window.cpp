@@ -219,7 +219,7 @@ void Window::drawPolygon(std::vector<std::pair<double, double>> points, uint32_t
     );
 }
 */
-void Window::drawPolygon(std::vector<Matrix<double>> points, uint32_t color) {
+void Window::drawPolygon(std::vector<Matrix2D<double>> points, uint32_t color) {
     for (int i = 0; i < points.size() - 1; ++i) {
         drawLine(
             points.at(i).at(0,0),   points.at(i).at(1,0),
