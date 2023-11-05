@@ -87,7 +87,7 @@ Window::~Window() {
 
     UnregisterClass(CLASS_NAME, _hInstance);
 
-    std::cout << "Closing Window\n";
+    std::cout << "\nClosing Window\n";
 }
 
 bool Window::ProcessMessages() {

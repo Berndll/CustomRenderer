@@ -16,6 +16,8 @@ public:
     T& at(int row, int col) { return _data.at(row).at(col); }
 
     void print();
+    void resize(int rows, int cols) { _data.resize(rows, std::vector<T>(cols, T())); }
+    static void rotate(std::vector<Matrix2D<double>>& points, Matrix2D<double> rotPoint, double deg);
 
     static Matrix2D<T> dotProduct(Matrix2D<T> Matrix2D0, Matrix2D<T> Matrix2D1);
 
@@ -107,5 +109,20 @@ void Matrix2D<T>::print() {
         }
         std::cout << "\n";
     }
-    std::cout << "\n" << std::endl;    
+    std::cout << std::endl;    
+}
+
+template <typename T> 
+void Matrix2D<T>::rotate(std::vector<Matrix2D<double>>& points, Matrix2D<double> rotPoint, double deg) {
+    Matrix2D<double> rotMat(2,2);
+    rotMat.at(0,0) =  cos(deg);
+    rotMat.at(1,0) =  sin(deg);
+    rotMat.at(0,1) = -sin(deg);
+    rotMat.at(1,1) =  cos(deg);
+
+    for (int i = 0; i < points.size(); ++i) {
+        points.at(i) -= rotPoint;
+        points.at(i) = Matrix2D<double>::dotProduct(rotMat, points.at(i));
+        points.at(i) += rotPoint;
+    }
 }

@@ -9,6 +9,11 @@
 int main() {
     Window window;
 
+    // Matrix3D<double> threeD (3,3,3);
+    // threeD.print();
+
+    // return 0;
+
     Matrix2D<double> rotPoint(2,1);
     // rotPoint = {100, 100};
     rotPoint.at(0,0) = 100;
@@ -39,16 +44,7 @@ int main() {
         window.drawPolygon(points, 0x00FFFF);
         window.update();
 
-        rotMat.at(0,0) =  cos(deg);
-        rotMat.at(1,0) =  sin(deg);
-        rotMat.at(0,1) = -sin(deg);
-        rotMat.at(1,1) =  cos(deg);
-
-        for (int i = 0; i < points.size(); ++i) {
-            points.at(i) -= rotPoint;
-            points.at(i) = Matrix2D<double>::dotProduct(rotMat, points.at(i));
-            points.at(i) += rotPoint;
-        }
+        Matrix2D<double>::rotate(points, rotPoint, deg);
 
         if (deg > 2 * M_PI) 
             deg -= 2 * M_PI;
