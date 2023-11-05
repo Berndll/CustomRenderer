@@ -17,6 +17,7 @@ public:
 
     void print();
     void resize(int rows, int cols) { _data.resize(rows, std::vector<T>(cols, T())); }
+    void rotate(Matrix2D<double> rotPoint, double deg);
     static void rotate(std::vector<Matrix2D<double>>& points, Matrix2D<double> rotPoint, double deg);
 
     static Matrix2D<T> dotProduct(Matrix2D<T> Matrix2D0, Matrix2D<T> Matrix2D1);
@@ -113,7 +114,27 @@ void Matrix2D<T>::print() {
 }
 
 template <typename T> 
+void Matrix2D<T>::rotate(Matrix2D<double> rotPoint, double deg) {
+    if (_cols != 1 && _rows != 2)
+        throw std::invalid_argument("Wrong matrix size (2x1 needed)");
+
+    Matrix2D<double> rotMat(2,2);
+    rotMat.at(0,0) =  cos(deg);
+    rotMat.at(1,0) =  sin(deg);
+    rotMat.at(0,1) = -sin(deg);
+    rotMat.at(1,1) =  cos(deg);
+
+    *this -= rotPoint;
+    *this = Matrix2D<double>::dotProduct(rotMat, *this);
+    *this += rotPoint;
+}
+
+template <typename T> 
 void Matrix2D<T>::rotate(std::vector<Matrix2D<double>>& points, Matrix2D<double> rotPoint, double deg) {
+    for (auto p : points)
+        if (p.getCols() != 1 && p.getRows() != 2)
+            throw std::invalid_argument("Wrong matrix size (2x1 needed)");
+
     Matrix2D<double> rotMat(2,2);
     rotMat.at(0,0) =  cos(deg);
     rotMat.at(1,0) =  sin(deg);

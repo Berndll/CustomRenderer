@@ -10,7 +10,6 @@
 #include <windows.h>
 
 #include "Matrix3D.hpp"
-#include "Rotate2D.hpp"
 
 LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -33,8 +32,6 @@ public:
     void drawPixel(int x, int y, uint32_t color);
     void drawLine(int x0, int y0, int x1, int y1, uint32_t color);
     void drawRect(int x0, int y0, int x1, int y1, uint32_t color);
-    // void drawPolygon(std::vector<std::pair<int, int>> points, uint32_t color);
-    // void drawPolygon(std::vector<std::pair<double, double>> points, uint32_t color);
     void drawPolygon(std::vector<Matrix2D<double>> points, uint32_t color);
 
 private:

@@ -44,7 +44,8 @@ int main() {
         window.drawPolygon(points, 0x00FFFF);
         window.update();
 
-        Matrix2D<double>::rotate(points, rotPoint, deg);
+        for (auto &p : points)
+            p.rotate(rotPoint, deg);
 
         if (deg > 2 * M_PI) 
             deg -= 2 * M_PI;
