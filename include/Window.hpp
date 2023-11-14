@@ -15,7 +15,7 @@ LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 class Window{
 public:
-    Window();
+    Window(int width, int height);
     Window(const Window&) = delete;
     Window& operator= (const Window&) = delete;
     ~Window();
@@ -37,6 +37,7 @@ public:
 private:
     HINSTANCE _hInstance;
     HWND _hWnd;
+    HDC _hdc;
     BITMAPINFO _bitmap_info;
     PVOID _memory;
 

@@ -1,4 +1,4 @@
-#include "Window.hpp"
+#include "../include/Window.hpp"
 
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     static bool size_changed = true;
@@ -21,7 +21,7 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
-Window::Window() : _hInstance(GetModuleHandle(nullptr)) {
+Window::Window(int width, int height) : _hInstance(GetModuleHandle(nullptr)), _width(width), _height(height) {
     std::cout << "Creating Window\n";
 
     const auto CLASS_NAME = L"My Window Class";
@@ -35,7 +35,7 @@ Window::Window() : _hInstance(GetModuleHandle(nullptr)) {
 
     RegisterClass(&wndClass);
 
-    DWORD style = WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU;
+    DWORD style = WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU | WS_SIZEBOX;
 
     RECT rect;
     rect.left = 250;
@@ -74,11 +74,8 @@ Window::Window() : _hInstance(GetModuleHandle(nullptr)) {
         NULL
     );
 
-    // RECT rect2;
-    // GetClientRect( _hWnd, &rect2 );
-    // auto w = rect2.right - rect2.left;
-    // std::cout << "w: " << w << " | _width: " << _width << std::endl;
-    
+    _hdc = GetDC(_hWnd);
+
     ShowWindow(_hWnd, SW_SHOW);
 }
 
@@ -140,7 +137,7 @@ void Window::bitmapinfo() {
 
 void Window::update() {
     StretchDIBits(
-        GetDC(_hWnd),    // draw on this window
+        _hdc,    // draw on this window
         0,      // start
         0,      // start
         _clientWidth,    // size
@@ -163,8 +160,16 @@ void Window::clearScreen(uint32_t color) {
 }
 
 void Window::drawPixel(int x, int y, uint32_t color) {
+    auto coord = _clientWidth * y + x;
+    if (coord >= _clientWidth * _clientHeight || coord < 0)
+        return;
+    // auto coord = (_clientWidth * (y + _clientHeight / 2)) + (x + _clientWidth / 2);
+
+    if (coord >= _clientWidth * _clientHeight || coord < 0)
+        return;
+    
     uint32_t* pixel = (uint32_t*)_memory;
-    pixel[_clientWidth * y + x] = color;
+    pixel[coord] = color;
 }
 
 void Window::drawLine(int x0, int y0, int x1, int y1, uint32_t color) {

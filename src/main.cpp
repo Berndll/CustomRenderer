@@ -1,85 +1,85 @@
 #include <iostream>
 #include <math.h>
 #include <vector>
-#include <fstream>
-#include <string>
 
-#include "Window.hpp"
+#include "../include/utils.hpp"
+#include "../include/Window.hpp"
 
 #define FPS 100 // default = 100
 
+using vec2d = std::vector<std::vector<double>>;
+using vec3d = std::vector<std::vector<std::vector<double>>>;
+
+template<typename T>
+using vec2T = std::vector<std::vector<T>>;
+
+void draw();
+
 int main() {
-    std::fstream input;
-    input.open("input/object.txt", std::ios::in);
-
-    if (input.is_open()) {
-        std::string str;
-
-        while (std::getline(input, str)) {
-            // for (int i = 0; i < str.size(); ++i) {
-            //     if (str.at(i) == ',') {
-            //         std::cout << "\n";
-            //     }
-            //     std::cout << str.at(i);
-            // }
-
-
-
-            // int it = 0, num;
-            // while (num != std::string::npos) {
-            //     num = static_cast<int>(temp.find(","));
-            //     for (int i = 0; i < num; ++i)
-            //         std::cout << temp.at(i) << "\n";
-            //         // std::cout << num << "\n";
-            //     it = 1;
-            // }
-        }
-        std::cout << "\n" << std::endl;
-        input.close();
-    }
-
-    return 0;
-
-    Window window;
-
-    // Matrix3D<double> threeD (3,3,3);
-    // threeD.print();
-
-    // return 0;
-
-    Matrix2D<double> rotPoint(2,1);
-    rotPoint.at(0,0) = 100;
-    rotPoint.at(1,0) = 100;
-    Matrix2D<double> rotMat(2,2);
-
     std::vector<Matrix2D<double>> points;
+    // std::cout << "test";
+    points = readFilePoints("input/object0.txt");
 
-    for (int i = 0; i < 4; i++) {
-        Matrix2D<double> point(2, 1);
-        points.push_back(point);
-    }
+    Window window(1000, 800);
+
+    Matrix2D<double> rotPoint(readFilePoints("input/rotPoint.txt").at(0));
 
     double deg = 0.01;    // in rad
 
-    points.at(0) = (40);
-    points.at(1).at(0,0) = (40);
-    points.at(1).at(1,0) = (160);
-    points.at(2) = (160);
-    points.at(3).at(0,0) = (160);
-    points.at(3).at(1,0) = (40);
+    Matrix2D<double> camera(readFilePoints("input/camera.txt").at(0));
+    Matrix2D<double> theta(readFilePoints("input/theta.txt").at(0));
 
+    std::vector<Matrix2D<double>> transformedPoints;
+    std::vector<Matrix2D<double>> projectedPoints;
+
+    for (int i = 0; i < points.size(); ++i) {
+        transformedPoints.push_back(points.at(i).transform(camera, theta));
+        projectedPoints.push_back(transformedPoints.at(i));
+    }
+
+    static double it = 0;
     while (window.ProcessMessages()) {
         window.clearScreen(0x000000);
-        window.drawPolygon(points, 0x00FFFF);
+
+        // window.drawPixel(0,0, 0xFFFFFF);
+
+        // window.drawPolygon(projectedPoints, 0xFFFFFF);
+
+        theta.at(0,0) += 0.001;
+        theta.at(1,0) += 0.001;
+        theta.at(2,0) += 0.001;
+
+        for (int i = 0; i < projectedPoints.size(); ++i)
+            for (int j = 0; j < projectedPoints.size(); ++j) {
+                window.drawLine(
+                    projectedPoints.at(i).at(0,0),
+                    projectedPoints.at(i).at(1,0),
+                    projectedPoints.at(j).at(0,0),
+                    projectedPoints.at(j).at(1,0),
+                    0x8FFFFF
+                );
+            }
+
+        for (int i = 0; i < transformedPoints.size(); ++i) {
+            transformedPoints.at(i) = points.at(i).transform(camera, theta);
+            projectedPoints.at(i) = transformedPoints.at(i);
+        }
+
         window.update();
-
-        for (auto &p : points)
-            p.rotate(rotPoint, deg);
-
-        if (deg >= 2 * M_PI) 
-            deg -= 2 * M_PI;
-
-        Sleep(1000 / FPS);
     }
     return 0;
+}
+
+void draw() {
+            // for (int x = 0; x < window.getWidth(); ++x)
+        //     for (int y = 0; y < window.getHeight(); ++y)
+/*                 window.drawPixel(x, y, (
+                    sin(x * 2 * M_PI / 1000) * cos(x * 2 * M_PI / 1000) * 
+                    sin(x * 2 * M_PI / 1000) *
+                    sin(y * 2 * M_PI / 1000) * cos(y * 2 * M_PI / 1000) *
+                    sin(y * 2 * M_PI / 1000) *
+                    0xFFFFFF));
+ */                // window.drawPixel(x, y, 10000 * log(x) / log(y));
+                // window.drawPixel(x, y, uint32_t(x*y - x * x));
+
 }

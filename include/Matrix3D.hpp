@@ -8,7 +8,7 @@ public:
     Matrix3D(int rows, int cols, int pages);
 
     void print();
-
+    Matrix3D<T> transform(Matrix3D<T> camera, Matrix3D<T> theta);
 
 private:
     int _rows, _cols, _pages;
@@ -28,4 +28,9 @@ void Matrix3D<T>::print() {
         _data.at(i).print();
         std::cout << "\n\n";
     }
+}
+
+template<typename T>
+Matrix3D<T> Matrix3D<T>::transform(Matrix3D<T> camera, Matrix3D<T> theta) {
+    
 }
