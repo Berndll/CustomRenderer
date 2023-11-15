@@ -92,26 +92,31 @@ bool Window::ProcessMessages() {
 
     while (PeekMessage(&msg, nullptr, 0u, 0u, PM_REMOVE)) {
         switch (msg.message) {
-        case WM_QUIT: 
+        case WM_QUIT:
+            PostQuitMessage(0);
             return false;
         case WM_SIZE:
-        break;
             std::cout << "Changed window size\n";
 
             RECT rect;
             GetClientRect(_hWnd, &rect);
-            _clientWidth = rect.right - rect.left;
+            _clientWidth  = rect.right - rect.left;
             _clientHeight = rect.bottom - rect.top;
+
+            _memory = nullptr;
 
             if (_memory)
                 VirtualFree(_memory, 0, MEM_RELEASE);
 
             _memory = VirtualAlloc(
-                0,
+                nullptr,
                 _clientWidth * _clientHeight * sizeof(uint32_t), 
                 MEM_RESERVE | MEM_COMMIT,
                 PAGE_READWRITE
             );
+
+            if (!_memory)
+                std::cout << "Failed to allocate memory.\n";
 
             bitmapinfo();
             break;
@@ -155,15 +160,15 @@ void Window::update() {
 
 void Window::clearScreen(uint32_t color) {
     uint32_t* pixel = (uint32_t*)_memory;
-    for (int i = 0; i < _width * _height; ++i)
+    for (int i = 0; i < _clientWidth * _clientHeight; ++i)
         pixel[i] = color;
 }
 
 void Window::drawPixel(int x, int y, uint32_t color) {
-    auto coord = _clientWidth * y + x;
-    if (coord >= _clientWidth * _clientHeight || coord < 0)
-        return;
-    // auto coord = (_clientWidth * (y + _clientHeight / 2)) + (x + _clientWidth / 2);
+    // auto coord = _clientWidth * y + x;
+    // if (coord >= _clientWidth * _clientHeight || coord < 0)
+    //     return;
+    auto coord = (_clientWidth * (y + _clientHeight / 2)) + (x + _clientWidth / 2);
 
     if (coord >= _clientWidth * _clientHeight || coord < 0)
         return;

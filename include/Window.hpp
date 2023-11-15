@@ -20,12 +20,13 @@ public:
     Window& operator= (const Window&) = delete;
     ~Window();
 
+    // static LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     bool ProcessMessages();
 
     void update();
 
-    int getWidth()   { return _width;  }
-    int getHeight()  { return _height; }
+    int getWidth() { return _width;  }
+    int getHeight() { return _height; }
     PVOID getMemory()  { return _memory; }
 
     void clearScreen(uint32_t color);
@@ -39,7 +40,7 @@ private:
     HWND _hWnd;
     HDC _hdc;
     BITMAPINFO _bitmap_info;
-    PVOID _memory;
+    PVOID _memory = nullptr;
 
     int _width = 640, _height = 480;
     long _clientWidth, _clientHeight;

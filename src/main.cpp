@@ -18,7 +18,7 @@ void draw();
 int main() {
     std::vector<Matrix2D<double>> points;
     // std::cout << "test";
-    points = readFilePoints("input/object0.txt");
+    points = readFilePoints("input/object.txt");
 
     Window window(1000, 800);
 
@@ -37,34 +37,39 @@ int main() {
         projectedPoints.push_back(transformedPoints.at(i));
     }
 
+    for (auto p : points)
+        p.print();
+
     static double it = 0;
     while (window.ProcessMessages()) {
         window.clearScreen(0x000000);
 
         // window.drawPixel(0,0, 0xFFFFFF);
 
+
+        window.drawPolygon(points, 0xFFFFFF);
         // window.drawPolygon(projectedPoints, 0xFFFFFF);
 
-        theta.at(0,0) += 0.001;
-        theta.at(1,0) += 0.001;
-        theta.at(2,0) += 0.001;
+        // theta.at(0,0) += 0.001;
+        // theta.at(1,0) += 0.001;
+        // theta.at(2,0) += 0.001;
 
-        for (int i = 0; i < projectedPoints.size(); ++i)
-            for (int j = 0; j < projectedPoints.size(); ++j) {
-                window.drawLine(
-                    projectedPoints.at(i).at(0,0),
-                    projectedPoints.at(i).at(1,0),
-                    projectedPoints.at(j).at(0,0),
-                    projectedPoints.at(j).at(1,0),
-                    0x8FFFFF
-                );
-            }
+        // for (int i = 0; i < projectedPoints.size(); ++i)
+        //     for (int j = 0; j < projectedPoints.size(); ++j) {
+        //         window.drawLine(
+        //             projectedPoints.at(i).at(0,0),
+        //             projectedPoints.at(i).at(1,0),
+        //             projectedPoints.at(j).at(0,0),
+        //             projectedPoints.at(j).at(1,0),
+        //             0x8FFFFF
+        //         );
+        //     }
 
-        for (int i = 0; i < transformedPoints.size(); ++i) {
-            transformedPoints.at(i) = points.at(i).transform(camera, theta);
-            projectedPoints.at(i) = transformedPoints.at(i);
-        }
-
+        // for (int i = 0; i < transformedPoints.size(); ++i) {
+        //     transformedPoints.at(i) = points.at(i).transform(camera, theta);
+        //     projectedPoints.at(i) = transformedPoints.at(i);
+        // }
+        
         window.update();
     }
     return 0;
