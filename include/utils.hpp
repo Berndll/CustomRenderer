@@ -29,6 +29,21 @@ std::vector<T> split(std::string str, const char splitChar = ',') {
     return vecResult;
 }
 
+template <typename T>
+void readFilePoints(std::string path, std::vector<std::vector<T>>& pointVec) {
+    std::string str;
+    std::fstream input;
+    input.open(path.c_str(), std::ios::in);
+
+    if (!input.is_open())
+        throw std::runtime_error("File is not open: " + path);
+
+    while (std::getline(input, str))
+        pointVec.push_back(split<T>(str));
+    
+    input.close();
+}
+
 std::vector<Matrix2D<double>> readFilePoints(std::string path) {
     std::fstream input;
     input.open(path.c_str(), std::ios::in);

@@ -87,12 +87,6 @@ private:
 
 template <typename T>
 Matrix2D<T>::Matrix2D(int rows, int cols) : _rows(rows), _cols(cols) {
-    /*
-    // for (int r = 0; r < rows; ++r) {
-    //     _data.push_back(std::vector<T>());
-    //     for (int c = 0; c < cols; ++c)
-    //         _data.back().push_back(T());
-    // }*/
     resize(rows, cols);
 }
 
@@ -202,8 +196,8 @@ Matrix2D<T> Matrix2D<T>::transform(Matrix2D<T> camera, Matrix2D<T> theta) {
     multiMatrix2.at(1,1) =  cos(theta.at(2,0));
     multiMatrix2.at(2,2) =  1;
 
-    result = multiMatrix0;
-    result = dotProduct(result, multiMatrix1);
+    // result = multiMatrix0;
+    result = dotProduct(multiMatrix0, multiMatrix1);
     result = dotProduct(result, multiMatrix2);
 
     // result.print();
@@ -214,6 +208,9 @@ Matrix2D<T> Matrix2D<T>::transform(Matrix2D<T> camera, Matrix2D<T> theta) {
 
     // result = dotProduct(result, tempDiff);
     
+    // for (auto t : tempDiff)
+        // std::cout << t < " ";
+    // tempDiff.print();
     // realResult.print();
 
     return realResult;
@@ -223,8 +220,21 @@ template <typename T>
 Matrix2D<T> Matrix2D<T>::project(Matrix2D<T> point, Matrix2D<T> plane) {
     Matrix2D<T> result(2,1);
 
-    result.at(0,0) = (plane.at(2,0) * point.at(0,0) / point.at(2,0)) + plane.at(0,0); 
-    result.at(1,0) = (plane.at(2,0) * point.at(1,0) / point.at(2,0)) + plane.at(1,0); 
+    result.at(0,0) = 
+        (plane.at(2,0) * point.at(0,0) / point.at(2,0)) + plane.at(0,0); 
+    result.at(1,0) = 
+        (plane.at(2,0) * point.at(1,0) / point.at(2,0)) + plane.at(1,0); 
+
+    return result;
+}
+
+template <typename T>
+std::vector<T>& operator* (const Matrix2D<T> m, const std::vector<T> v) {
+    std::vector<T> result(m.getRows(), 0);
+
+    for (int r = 0; r < m.getRows(); ++r)
+        for (int c = 0; c < m.getCols(); ++c)
+            result.at(r) += m.at(r, c) * v.at(r);
 
     return result;
 }
