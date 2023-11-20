@@ -19,10 +19,7 @@ int main() {
     std::vector<Matrix2D<double>> points;
     points = readFilePoints("input/object.txt");
 
-    // for (auto p : points)
-    //     p.print();
-
-    std::vector<Matrix2D<double>> temp2;
+    // std::vector<Matrix2D<double>> temp2;
 
     Window window(1000, 800);
 
@@ -33,6 +30,10 @@ int main() {
     Matrix2D<double> camera(readFilePoints("input/camera.txt").at(0));
     Matrix2D<double> theta(readFilePoints("input/theta.txt").at(0));
 
+    Vector<double> v;
+    v = {0};
+    
+    /*
     std::vector<Matrix2D<double>> transformedPoints;
     std::vector<Matrix2D<double>> projectedPoints;
 
@@ -44,23 +45,12 @@ int main() {
     Matrix2D<double> temp3(2,1);
     temp3.at(0,0) = 0;
     temp3.at(1,0) = 0;
-    // temp3.print();
 
     for (int i = 0; i < 8; ++i)
-        temp2.push_back(temp3);
+        temp2.push_back(temp3);*/
 
-    // temp2.resize(8);
-    // for (auto a : temp2)
-    //     a.resize(2,1);
-
-    // for (auto p : temp2)
-    //     p.print();
-
-    // static double it = 0;
-    Matrix2D<double> temp(readFilePoints("input/plane.txt").at(0));
-    // temp.at(2,0) = 75;
-    static double it = 0.1;
-
+    // Matrix2D<double> temp(readFilePoints("input/plane.txt").at(0));
+    
     while (window.ProcessMessages()) {
         window.clearScreen(0x000000);
 
@@ -68,35 +58,19 @@ int main() {
 
         // window.drawPolygon(points, 0xFFFFFF);
 
+
+        /*
+
         // window.drawPolygon(projectedPoints, 0xFFFFFF);
-        // camera.at(1,0) = 100;
 
-        // temp.at(2,0) -= 0.1;
         
-        // temp.at(0,0) += 0.01;
-        // temp.at(1,0) += 0.01;
-
-        // static double angle = 180.0;
-        it += 0.001;
-
-
-        // theta.at(0,0) = -M_PI_4;
-        // theta.at(1,0) = M_PI_4;
-        // theta.at(2,0) = M_PI_4;
-        // theta.at(2,0) += 0.01;
-
-        // temp.at(1,0) += 0.5;
-
         double aspectRatio = 16 / 9.0;
         double horizontalFOV = 60 * M_PI / 180;
         double verticalFOV = 2 * atan(tan(horizontalFOV / (2 * aspectRatio)));
         
         temp.at(2,0) = camera.at(2,0) + (8 / tan(horizontalFOV / (2 * 1)));
 
-        // std::cout << horizontalFOV;
-
-        // camera.at(1,0) += 0.05;
-
+        
         for (int i = 0; i < projectedPoints.size(); ++i)
             for (int j = 0; j < projectedPoints.size(); ++j) {
                 // window.drawLine(
@@ -114,24 +88,32 @@ int main() {
                     0xFFFFFF
                 );
             }
-
+        uint32_t color = 0xFFFFFF;
+        window.drawLine(temp2.at(0).at(0,0), temp2.at(0).at(1,0), temp2.at(1).at(0,0), temp2.at(1).at(1,0), color);
+        window.drawLine(temp2.at(0).at(0,0), temp2.at(0).at(1,0), temp2.at(2).at(0,0), temp2.at(2).at(1,0), color);
+        window.drawLine(temp2.at(0).at(0,0), temp2.at(0).at(1,0), temp2.at(4).at(0,0), temp2.at(4).at(1,0), color);
+        window.drawLine(temp2.at(1).at(0,0), temp2.at(1).at(1,0), temp2.at(5).at(0,0), temp2.at(5).at(1,0), color);
+        window.drawLine(temp2.at(1).at(0,0), temp2.at(1).at(1,0), temp2.at(3).at(0,0), temp2.at(3).at(1,0), color);
+        window.drawLine(temp2.at(2).at(0,0), temp2.at(2).at(1,0), temp2.at(6).at(0,0), temp2.at(6).at(1,0), color);
+        window.drawLine(temp2.at(3).at(0,0), temp2.at(3).at(1,0), temp2.at(2).at(0,0), temp2.at(2).at(1,0), color);
+        window.drawLine(temp2.at(3).at(0,0), temp2.at(3).at(1,0), temp2.at(7).at(0,0), temp2.at(7).at(1,0), color);
+        window.drawLine(temp2.at(4).at(0,0), temp2.at(4).at(1,0), temp2.at(5).at(0,0), temp2.at(5).at(1,0), color);
+        window.drawLine(temp2.at(4).at(0,0), temp2.at(4).at(1,0), temp2.at(6).at(0,0), temp2.at(6).at(1,0), color);
+        window.drawLine(temp2.at(5).at(0,0), temp2.at(5).at(1,0), temp2.at(7).at(0,0), temp2.at(7).at(1,0), color);
+        window.drawLine(temp2.at(6).at(0,0), temp2.at(6).at(1,0), temp2.at(7).at(0,0), temp2.at(7).at(1,0), color); 
 
         for (int i = 0; i < transformedPoints.size(); ++i) {
             transformedPoints.at(i) = points.at(i).transform(camera, theta);
 
-            // std::cout << 
-            //     projectedPoints.size() << " | " << 
-            //     transformedPoints.size() << "\n";
+            // std::cout << transformedPoints.at(0).at(0,0) << " | " << transformedPoints.at(0).at(1,0) << std::endl;
+            // std::cout << projectedPoints.at(0).at(0,0) << " | " << projectedPoints.at(0).at(1,0) << std::endl;
 
 
-            temp2.at(i) = 
-                projectedPoints.at(i).project(transformedPoints.at(i), temp);
-            // std::cout << temp2.at(0).at(0,0);
+            temp2.at(i) = projectedPoints.at(i).project(transformedPoints.at(i), temp);
+            std::cout << temp2.at(0).at(0,0) << " | " << temp2.at(0).at(1,0) << std::endl;
 
             // temp2.at(i).print();
-        }
-
-
+        }*/
         window.update();
     }
     return 0;

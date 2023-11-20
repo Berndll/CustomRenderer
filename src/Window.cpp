@@ -35,7 +35,11 @@ Window::Window(int width, int height) : _hInstance(GetModuleHandle(nullptr)), _w
 
     RegisterClass(&wndClass);
 
-    DWORD style = WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU | WS_SIZEBOX;
+    DWORD style = 
+        WS_CAPTION | 
+        WS_MINIMIZEBOX | 
+        WS_SYSMENU | 
+        WS_SIZEBOX;         // Allows Resizing
 
     RECT rect;
     rect.left = 250;

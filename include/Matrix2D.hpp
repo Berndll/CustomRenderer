@@ -1,7 +1,8 @@
 #pragma once
 
 #include <iostream>
-#include <vector>
+
+#include "Vector.hpp"
 
 template<typename T>
 class Matrix2D {
@@ -21,8 +22,10 @@ public:
     void resize(int rows, int cols) { _data.resize(rows, std::vector<T>(cols, T())); }
     void rotate(Matrix2D<double> rotPoint, double deg);
 
-    Matrix2D<T> transform(Matrix2D<T> camera, Matrix2D<T> theta);
-    Matrix2D<T> project(Matrix2D<T> point, Matrix2D<T> plane);
+    // Matrix2D<T> transform(Matrix2D<T> camera, Matrix2D<T> theta);
+    // Matrix2D<T> project(Matrix2D<T> point, Matrix2D<T> plane);
+    
+    std::vector<T> project(std::vector<T> v);
 
     static void rotate(std::vector<Matrix2D<double>>& points, Matrix2D<double> rotPoint, double deg);
     static Matrix2D<T> dotProduct(Matrix2D<T> Matrix2D0, Matrix2D<T> Matrix2D1);
@@ -164,6 +167,7 @@ void Matrix2D<T>::rotate(std::vector<Matrix2D<double>>& points, Matrix2D<double>
     }
 }
 
+/*
 template <typename T>
 Matrix2D<T> Matrix2D<T>::transform(Matrix2D<T> camera, Matrix2D<T> theta) {
     Matrix2D<T> tempDiff(3,1);
@@ -220,13 +224,18 @@ template <typename T>
 Matrix2D<T> Matrix2D<T>::project(Matrix2D<T> point, Matrix2D<T> plane) {
     Matrix2D<T> result(2,1);
 
-    result.at(0,0) = 
-        (plane.at(2,0) * point.at(0,0) / point.at(2,0)) + plane.at(0,0); 
-    result.at(1,0) = 
-        (plane.at(2,0) * point.at(1,0) / point.at(2,0)) + plane.at(1,0); 
+    // result.at(0,0) = 
+    //     (plane.at(2,0) * point.at(0,0) / point.at(2,0)) + plane.at(0,0); 
+    // result.at(1,0) = 
+    //     (plane.at(2,0) * point.at(1,0) / point.at(2,0)) + plane.at(1,0); 
+
+    result.at(0,0) =
+        (point.at(0,0) * 16) / (point.at(2,0));
+    result.at(1,0) =
+        (point.at(1,0) * 9) / (point.at(2,0));
 
     return result;
-}
+}*/
 
 template <typename T>
 std::vector<T>& operator* (const Matrix2D<T> m, const std::vector<T> v) {
@@ -237,4 +246,15 @@ std::vector<T>& operator* (const Matrix2D<T> m, const std::vector<T> v) {
             result.at(r) += m.at(r, c) * v.at(r);
 
     return result;
+}
+
+
+template <typename T>
+std::vector<T> Matrix2D<T>::project(std::vector<T> v) {
+    Matrix2D<T> matProject({
+        {1, 0, 0},
+        {0, 1, 0}
+    });
+
+    return matProject * v;
 }
