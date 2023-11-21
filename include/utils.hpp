@@ -30,7 +30,7 @@ std::vector<T> split(std::string str, const char splitChar = ',') {
 }
 
 template <typename T>
-void readFilePoints(std::string path, std::vector<std::vector<T>>& pointVec) {
+void readFilePoints(std::string path, Vector<T>& pointVec) {
     std::string str;
     std::fstream input;
     input.open(path.c_str(), std::ios::in);
@@ -40,7 +40,23 @@ void readFilePoints(std::string path, std::vector<std::vector<T>>& pointVec) {
 
     while (std::getline(input, str))
         pointVec.push_back(split<T>(str));
-    
+
+    input.close();
+}
+
+template <typename T>
+Vector<T> readFilePoints(std::string path) {
+    Vector<T> pointVec;
+    std::string str;
+    std::fstream input;
+    input.open(path.c_str(), std::ios::in);
+
+    if (!input.is_open())
+        throw std::runtime_error("File is not open: " + path);
+
+    while (std::getline(input, str))
+        pointVec.push_back(split<T>(str));
+
     input.close();
 }
 
@@ -54,7 +70,6 @@ std::vector<Matrix2D<double>> readFilePoints(std::string path) {
         throw std::runtime_error("File is not open: " + path);
 
     std::string str;
-
 
     while (std::getline(input, str)) {
         auto count = std::count(str.begin(), str.end(), ',');

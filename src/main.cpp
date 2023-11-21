@@ -16,6 +16,13 @@ using vec2 = std::vector<std::vector<T>>;
 void draw();
 
 int main() {
+    Vector<double> vec("input/camera.txt");
+    // vec.print();
+
+    // vec.strSplit("20,10,10", ',');
+
+    return 0;
+
     std::vector<Matrix2D<double>> points;
     points = readFilePoints("input/object.txt");
 
@@ -29,9 +36,6 @@ int main() {
 
     Matrix2D<double> camera(readFilePoints("input/camera.txt").at(0));
     Matrix2D<double> theta(readFilePoints("input/theta.txt").at(0));
-
-    Vector<double> v;
-    v = {0};
     
     /*
     std::vector<Matrix2D<double>> transformedPoints;
@@ -47,22 +51,21 @@ int main() {
     temp3.at(1,0) = 0;
 
     for (int i = 0; i < 8; ++i)
-        temp2.push_back(temp3);*/
+        temp2.push_back(temp3);
 
-    // Matrix2D<double> temp(readFilePoints("input/plane.txt").at(0));
+    // Matrix2D<double> temp(readFilePoints("input/plane.txt").at(0));*/
     
     while (window.ProcessMessages()) {
         window.clearScreen(0x000000);
 
+
+
+        /*
         // window.drawPixel(0,0, 0xFFFFFF);
 
         // window.drawPolygon(points, 0xFFFFFF);
 
-
-        /*
-
         // window.drawPolygon(projectedPoints, 0xFFFFFF);
-
         
         double aspectRatio = 16 / 9.0;
         double horizontalFOV = 60 * M_PI / 180;
@@ -70,7 +73,6 @@ int main() {
         
         temp.at(2,0) = camera.at(2,0) + (8 / tan(horizontalFOV / (2 * 1)));
 
-        
         for (int i = 0; i < projectedPoints.size(); ++i)
             for (int j = 0; j < projectedPoints.size(); ++j) {
                 // window.drawLine(
