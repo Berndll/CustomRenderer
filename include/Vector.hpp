@@ -19,6 +19,8 @@ public:
 
     Vector<T>& operator=(Vector<T> v);
     Vector<T>& operator=(std::initializer_list<T> v);
+    Vector<T>& operator+=(Vector<T> v);
+    Vector<T>& operator-=(Vector<T> v);
 
     bool operator==(Vector<T> v);
 
@@ -26,55 +28,57 @@ public:
 private:
     std::vector<T> _vec;
 
-    void sizeCheck(int a, int b) { if (a != b) std::runtime_error("Unmatching vector sizes."); }
+    void sizeCheck(Vector<T> a, Vector<T> b) { if (a.size() != b.size()) std::runtime_error("Unmatching vector sizes."); }
 };
 
 template<typename T>
 Vector<T>::Vector(std::string path) {
     std::string str;
     std::fstream input;
-    Vector<T> tempVec = {0,0,0};
     input.open(path.c_str(), std::ios::in);
 
     if (!input.is_open())
         throw std::runtime_error("File is not open: " + path);
 
-
-    while (std::getline(input, str)) {
-        _vec = tempVec;
-    }
-
-    std::cout << tempVec.size();
-        // _vec = strSplit(str);
+    while (std::getline(input, str))
+        *this = strSplit(str);
 
     input.close();
 }
 
 template<typename T>
 Vector<T>& Vector<T>::operator=(Vector<T> v) {
-    _vec.resize(v.size());
-    for (int i = 0; i < size(); ++i)
-        _vec.at(i) = v.at(i);
+    if (this != &v) {
+        _vec.resize(v.size());
+        for (int i = 0; i < size(); ++i)
+            _vec.at(i) = v.at(i);
+    }
+    return *this;
 }
-
-// template<typename T>
-// Vector<T>& Vector<T>::operator=(const Vector<T>& v) {
-//     if (this != &v) { // Check for self-assignment
-//         _vec.resize(v.size());
-//         for (int i = 0; i < size(); ++i)
-//             _vec.at(i) = v.at(i);
-//     }
-//     return *this;
-// }
-
 template<typename T>
 Vector<T>& Vector<T>::operator=(std::initializer_list<T> v) {
     _vec.assign(v.begin(), v.end());
+    return *this;
+}
+
+template<typename T>
+Vector<T>& Vector<T>::operator+=(Vector<T> v) {
+    sizeCheck(*this, v);
+    for (int i = 0; i < size(); ++i)
+        _vec.at(i) += v.at(i);
+    return *this;
+}
+template<typename T>
+Vector<T>& Vector<T>::operator-=(Vector<T> v) {
+    sizeCheck(*this, v);
+    for (int i = 0; i < size(); ++i)
+        _vec.at(i) -= v.at(i);
+    return *this;
 }
 
 template<typename T>
 bool Vector<T>::operator==(Vector<T> v) {
-    sizeCheck(_vec.size(), v.size());
+    sizeCheck(*this, v);
     for (int i = 0; i < _vec.size(); ++i)
         if (_vec.at(i) != v.at(i)) 
             return 0;

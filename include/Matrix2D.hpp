@@ -167,6 +167,29 @@ void Matrix2D<T>::rotate(std::vector<Matrix2D<double>>& points, Matrix2D<double>
     }
 }
 
+template <typename T>
+std::vector<T>& operator* (const Matrix2D<T> m, const std::vector<T> v) {
+    std::vector<T> result(m.getRows(), 0);
+
+    for (int r = 0; r < m.getRows(); ++r)
+        for (int c = 0; c < m.getCols(); ++c)
+            result.at(r) += m.at(r, c) * v.at(r);
+
+    return result;
+}
+
+template <typename T>
+std::vector<T> Matrix2D<T>::project(std::vector<T> v) {
+    Matrix2D<T> matProject({
+        {1, 0, 0},
+        {0, 1, 0}
+    });
+
+    return matProject * v;
+}
+
+
+
 /*
 template <typename T>
 Matrix2D<T> Matrix2D<T>::transform(Matrix2D<T> camera, Matrix2D<T> theta) {
@@ -236,25 +259,3 @@ Matrix2D<T> Matrix2D<T>::project(Matrix2D<T> point, Matrix2D<T> plane) {
 
     return result;
 }*/
-
-template <typename T>
-std::vector<T>& operator* (const Matrix2D<T> m, const std::vector<T> v) {
-    std::vector<T> result(m.getRows(), 0);
-
-    for (int r = 0; r < m.getRows(); ++r)
-        for (int c = 0; c < m.getCols(); ++c)
-            result.at(r) += m.at(r, c) * v.at(r);
-
-    return result;
-}
-
-
-template <typename T>
-std::vector<T> Matrix2D<T>::project(std::vector<T> v) {
-    Matrix2D<T> matProject({
-        {1, 0, 0},
-        {0, 1, 0}
-    });
-
-    return matProject * v;
-}

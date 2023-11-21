@@ -3,5 +3,10 @@ INCLUDE 	= include
 LIBRARIES 	= gdi32
 SOURCE 		= src
 
-all:
+all: compile execute
+
+compile:
 	g++ $(wildcard $(SOURCE)/*.cpp) -o main -I$(INCLUDE) -l$(LIBRARIES) -D$(DEFINE)
+
+execute:
+	./main
