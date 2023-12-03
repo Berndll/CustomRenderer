@@ -180,6 +180,17 @@ void Window::drawPixel(int x, int y, uint32_t color) {
     uint32_t* pixel = (uint32_t*)_memory;
     pixel[coord] = color;
 }
+void Window::drawPixel(Vector<double> point, uint32_t color) {
+    int x = point.at(0), y = point.at(1);
+
+    auto coord = (_clientWidth * (y + _clientHeight / 2)) + (x + _clientWidth / 2);
+
+    if (coord >= _clientWidth * _clientHeight || coord < 0)
+        return;
+    
+    uint32_t* pixel = (uint32_t*)_memory;
+    pixel[coord] = color;
+}
 
 void Window::drawLine(int x0, int y0, int x1, int y1, uint32_t color) {
     auto abs = [](int n) { return (n > 0) ? n : -n; };
@@ -196,6 +207,11 @@ void Window::drawLine(int x0, int y0, int x1, int y1, uint32_t color) {
         if (e2 > dy) { err += dy; x0 += sx; } /* e_xy+e_x > 0 */
         if (e2 < dx) { err += dx; y0 += sy; } /* e_xy+e_y < 0 */
     }
+}
+
+template<typename T>
+void Window::drawLine(Vector<T> p0, Vector<T> p1, uint32_t color) {
+    drawLine(p0.at(0), p0.at(1), p1.at(0), p1.at(1), color);
 }
 
 void Window::drawRect(int x0, int y0, int x1, int y1, uint32_t color) {
@@ -246,4 +262,10 @@ void Window::drawPolygon(std::vector<Matrix2D<double>> points, uint32_t color) {
         points.back().at(0,0), points.back().at(1,0),
         color
     );
+}
+
+void Window::drawPolygon(Matrix<double> points, uint32_t color) {
+    for (int i = 0; i < points.getRows() - 1; ++i)
+        drawLine(points.at(i), points.at(i + 1), color);
+    drawLine(points.at(0), points.at(points.getRows() -1), color);
 }

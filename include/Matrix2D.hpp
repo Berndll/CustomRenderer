@@ -188,8 +188,6 @@ std::vector<T> Matrix2D<T>::project(std::vector<T> v) {
     return matProject * v;
 }
 
-
-
 /*
 template <typename T>
 Matrix2D<T> Matrix2D<T>::transform(Matrix2D<T> camera, Matrix2D<T> theta) {

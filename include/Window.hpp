@@ -10,6 +10,7 @@
 #include <windows.h>
 
 #include "Matrix3D.hpp"
+#include "Matrix.hpp"
 
 LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -31,9 +32,13 @@ public:
 
     void clearScreen(uint32_t color);
     void drawPixel(int x, int y, uint32_t color);
+    void drawPixel(Vector<double> point, uint32_t color);
     void drawLine(int x0, int y0, int x1, int y1, uint32_t color);
+    template<typename T>
+    void drawLine(Vector<T> p1, Vector<T> p2, uint32_t color);
     void drawRect(int x0, int y0, int x1, int y1, uint32_t color);
     void drawPolygon(std::vector<Matrix2D<double>> points, uint32_t color);
+    void drawPolygon(Matrix<double> points, uint32_t color);
 
 private:
     HINSTANCE _hInstance;

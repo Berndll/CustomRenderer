@@ -5,6 +5,8 @@
 #include "../include/utils.hpp"
 #include "../include/Window.hpp"
 
+#include "../include/Matrix.hpp"
+
 #define FPS 100 // default = 100
 
 using vec2d = std::vector<std::vector<double>>;
@@ -16,27 +18,28 @@ using vec2 = std::vector<std::vector<T>>;
 void draw();
 
 int main() {
-    Vector<double> vec("input/camera.txt");
-    // vec.print();
+    Window window(512, 512);
 
-    // vec.strSplit("20,10,10", ',');
+    Matrix<double> worldToCamera(4, 4);
 
-    return 0;
-
-    std::vector<Matrix2D<double>> points;
-    points = readFilePoints("input/object.txt");
-
-    // std::vector<Matrix2D<double>> temp2;
-
-    Window window(1000, 800);
-
-    Matrix2D<double> rotPoint(readFilePoints("input/rotPoint.txt").at(0));
-
-    double deg = 0.01;    // in rad
-
-    Matrix2D<double> camera(readFilePoints("input/camera.txt").at(0));
-    Matrix2D<double> theta(readFilePoints("input/theta.txt").at(0));
+    for (int i = 0; i < worldToCamera.getRows(); ++i)
+        for (int j = 0; j < worldToCamera.getCols(); ++j)
+            worldToCamera.at(i, j) = 0;
     
+    worldToCamera.at(3, 1) = -10;
+    worldToCamera.at(3, 2) = -20;
+
+    double fov = 90, near_clip = 0.1, far_clip = 100;
+    
+    Matrix<double> mat(4, 4);
+    Matrix<double>::setProjectionMatrix(fov, near_clip, far_clip, mat);
+
+    Matrix<double> points("input/test.txt");
+
+    Vector<double> 
+        rotPoint("input/rotPoint.txt"),
+        camera("input/camera.txt"),
+        theta("input/theta.txt");    
     /*
     std::vector<Matrix2D<double>> transformedPoints;
     std::vector<Matrix2D<double>> projectedPoints;
@@ -57,9 +60,9 @@ int main() {
     
     while (window.ProcessMessages()) {
         window.clearScreen(0x000000);
-
-
-
+    }
+        // for (int i = 0; i < points.getRows(); ++i)
+        //     points.at(i).at(0) += 1;
         /*
         // window.drawPixel(0,0, 0xFFFFFF);
 
@@ -67,7 +70,7 @@ int main() {
 
         // window.drawPolygon(projectedPoints, 0xFFFFFF);
         
-        double aspectRatio = 16 / 9.0;
+        float aspectRatio = 16 / 9.0;
         double horizontalFOV = 60 * M_PI / 180;
         double verticalFOV = 2 * atan(tan(horizontalFOV / (2 * aspectRatio)));
         
