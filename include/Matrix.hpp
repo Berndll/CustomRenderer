@@ -106,31 +106,6 @@ void Matrix<T>::resize(int rows, int cols) {
 }
 
 template<typename T>
-Vector<T> Matrix<T>::project(Vector<T> v, T near_clip, T far_clip, T fov) {
-    T clip = -far_clip / (far_clip - near_clip);
-    T scale = 1 / tan(fov * M_PI_2 / 180);
-
-    Matrix<double> projection_matrix = {
-        { scale,      0,                0,  0}, 
-        {     0,  scale,                0,  0}, 
-        {     0,      0,             clip, -1}, 
-        {     0,      0, clip * near_clip,  0}
-    };
-
-    v *= projection_matrix;
-
-    if (v.at(3) != 1)
-        for (int i = 0; i < v.size() - 1; ++i)
-            v.at(i) /= v.at(3);
-
-    Vector<T> result(3);
-    for (int i = 0; i < result.size(); ++i)
-        result.at(i) = v.at(i);
-
-    return result;
-}
-
-template<typename T>
 Vector<T> operator*=(Vector<T>& v, Matrix<T> m) {
     Vector<T> result(m.getCols(), 0);
 
@@ -164,38 +139,4 @@ void Matrix<T>::setProjectionMatrix(const double fov, const double near_clip, co
         {     0,      0,             clip, -1}, 
         {     0,      0, clip * near_clip,  0}
     };
-}
-
-template<typename T>
-void Matrix<T>::multPointMatrix(Vector<T> in, Vector<T>& out, Matrix<T> m) {
-    std::cout << "In:" << '\n';
-    in.print();
-
-    out.at(0) = 0;
-    out.at(1) = 0;
-    out.at(2) = 0;
-
-    float w = 0;
-
-    out.at(0) = in.at(0) * m.at(0,0) + in.at(1) * m.at(1,0) +
-                in.at(2) * m.at(2,0) +            m.at(3,0);
-
-    out.at(1) = in.at(0) * m.at(0,1) + in.at(1) * m.at(1,1) +
-                in.at(2) * m.at(2,1) +            m.at(3,1);
-
-    out.at(2) = in.at(0) * m.at(0,2) + in.at(1) * m.at(1,2) +
-                in.at(2) * m.at(2,2) +            m.at(3,2);
-
-    w =         in.at(0) * m.at(0,3) + in.at(1) * m.at(1,3) +
-                in.at(2) * m.at(2,3) +            m.at(3,3);
-
-    std::cout << "Out:" << '\n';
-    out.print();
-
-    if (w != 1 && w != 0) {
-        out.at(0) /= w;
-        out.at(1) /= w;
-        out.at(2) /= w;
-    }
-
 }
