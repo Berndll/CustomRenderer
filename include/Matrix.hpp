@@ -1,142 +1,153 @@
 #pragma once
 
-#include "Vector.hpp"
+#include <iostream>
+#include <initializer_list>
+#include <vector>
 
-template <typename T>
+template<typename T>
 class Matrix {
+    using vec2 = std::vector<std::vector<T>>;
+
+    struct Size {
+        int rows;
+        int cols;
+    };
+
 public:
-    Matrix(int rows, int cols);  
-    Matrix(std::initializer_list<std::initializer_list<T>> il);
-    Matrix(std::string path);
+    Matrix(int rows, int cols);
+    Matrix(std::initializer_list<T> list);
 
-    const int getRows() { return _rows; }
-    const int getCols() { return _cols; }
+    T& at(int row, int col) { return _data.at(row).at(col); }
 
-    T& at(int row, int col) { return _mat.at(row).at(col); }
-    Vector<T>& at(int row) { return _mat.at(row); }
-
+    bool setSize(int rows, int cols);
+    typename Matrix<T>::Size getSize();
     void print();
-    static Vector<T> project(Vector<T> v, T near_clip, T far_clip, T fov);
-    void resize() { this->resize(_rows, _cols); }
-    void resize(int rows, int cols);
 
-    static void setProjectionMatrix(const double fov, const double near_clip, const double far_clip, Matrix<T>& m);
-    static void multPointMatrix(Vector<T> in, Vector<T>& out, const Matrix<T> m);
+    Matrix<T> operator+(const Matrix<T>& other) const;
+    Matrix<T> operator-(const Matrix<T>& other) const;
+    Matrix<T>& operator=(std::initializer_list<std::initializer_list<T>> list);
+    Matrix<T>& operator=(const Matrix<T> other);
+    Matrix<T>& operator+=(const Matrix<T> other);
+    Matrix<T>& operator-=(const Matrix<T> other);    
 
 private:
-    Vector<Vector<T>> _mat;
     int _rows, _cols;
-    T _fov, _near, _far;
+    vec2 _data;
+
+    template<typename Func>
+    Matrix<T>& assignmentOperation(const Matrix<T>& other, Func op);
+    template<typename Func>
+    Matrix<T> binaryOperation(const Matrix<T>& other, Func op) const;
 };
 
-template <typename T>
-Matrix<T>::Matrix(int rows, int cols) : _rows(rows), _cols(cols) {
-    this->resize(_rows, _cols);
+template<typename T>
+Matrix<T>::Matrix(int rows, int cols) : _rows(rows), _cols(cols), _data(rows, std::vector<T>(cols)) {
 }
 
 template<typename T>
-Matrix<T>::Matrix(std::initializer_list<std::initializer_list<T>> il) :
-    Matrix<T>::Matrix(il.size(), il.size() ? il.begin()->size() : 0) {
-    int r = 0, c = 0;
+Matrix<T>::Matrix(std::initializer_list<T> list) {
 
-    for (auto& row : il) {
-        for (auto& item : row)
-            this->at(r, c++) = item;
-        c = 0;
-        ++r;
-    }
 }
 
 template<typename T>
-Matrix<T>::Matrix(std::string path) {
-    std::string str;
-    std::ifstream input;
-    input.open(path, std::ios::in);
-
-    if (!input.is_open())
-        throw std::runtime_error("File is not open: " + path);
-
-    int row = 0, col = 0;
-
-    while (std::getline(input, str)) {
-        size_t splitPos;
-        _mat.emplace_back();
-
-        do {
-            splitPos = str.find(',');
-            if (splitPos == std::string::npos)
-                splitPos = str.find("\n");
-
-            std::stringstream ss(str.substr(0, splitPos));
-            T value;
-            ss >> value;
-
-            _mat.at(row).push_back(value);
-            str = str.substr(splitPos + 1);
-            col++;
-        } while (splitPos != std::string::npos);
-        col = 0;
-        row++;
+bool Matrix<T>::setSize(int rows, int cols) {
+    if (rows <= 0 || cols <= 0) {
+        throw std::invalid_argument("Invalid matrix size!");
+        exit(0);
     }
 
-    _rows = row;
-    _cols = _mat.at(0).size();
-
-    input.close();
-}
-
-template<typename T> 
-void Matrix<T>::print() {
-    for (int r = 0; r < _rows; ++r) {    
-        for (int c = 0; c < _cols; ++c)
-            std::cout << this->at(r, c) << "\t";
-        std::cout << "\n";
-    }
-    std::cout << std::endl;    
-}
-
-template<typename T>
-void Matrix<T>::resize(int rows, int cols) {
     _rows = rows;
     _cols = cols;
-    _mat.resize(rows);
 
-    for (int i = 0; i < rows; ++i)
-        _mat.at(i).resize(cols);
-}
-
-template<typename T>
-Vector<T> operator*=(Vector<T>& v, Matrix<T> m) {
-    Vector<T> result(m.getCols(), 0);
-
-    std::cout << "Vector: " << '\n';
-    v.print();
-
-    std::cout << "Matrix: " << '\n';
-    m.print();
-
-    std::cout << "\n\n";
-
-    for (int c = 0; c < m.getCols(); ++c) {
-        for (int r = 0; r < m.getRows(); ++r) {
-            std::cout << "(" << r << "," << c << ") ";
-            result.at(c) += v.at(r) * m.at(r, c);
-        }
-        std::cout << std::endl;
+    _data.resize(_rows);
+    for (auto& vec : _data) {  
+        vec.resize(_cols);
     }
     
-    v = result;
+    return true;
 }
 
 template<typename T>
-void Matrix<T>::setProjectionMatrix(const double fov, const double near_clip, const double far_clip, Matrix<T>& m) {
-    double clip = -far_clip / (far_clip - near_clip);
-    double scale = 1 / tan(fov * M_PI_2 / 180);
+typename Matrix<T>::Size Matrix<T>::getSize() {
+    return { _rows, _cols };
+}
 
-    m = {
-        { scale,      0,                0,  0}, 
-        {     0,  scale,                0,  0}, 
-        {     0,      0,             clip, -1}, 
-        {     0,      0, clip * near_clip,  0}
-    };
+template<typename T>
+void Matrix<T>::print() {
+    std::cout
+        << "- Size: {"
+        << getSize().rows
+        << ", "
+        << getSize().cols
+        << "}"
+        << std::endl;
+
+    std::cout << "- Values: {\n";
+    for (auto& vec : _data) {
+        std::cout << "   { ";
+        for (auto val : vec) {
+            std::cout << val << ", ";
+        }
+        std::cout << "}\n";
+    }
+    std::cout << "}" << std::endl;
+}
+
+template<typename T>
+template<typename Func>
+Matrix<T>& Matrix<T>::assignmentOperation(const Matrix<T>& other, Func op) {
+    if (_rows != other._rows || _cols != other._cols)
+        throw std::invalid_argument("Matrix dimensions must match for operation.");
+    
+    for (int i = 0; i < _rows; ++i)
+        for (int j = 0; j < _cols; ++j)
+            op(_data[i][j], other._data[i][j]);
+}
+
+template<typename T>
+template<typename Func>
+Matrix<T> Matrix<T>::binaryOperation(const Matrix<T>& other, Func op) const {
+    if (_rows != other._rows || _cols != other._cols)
+        throw std::invalid_argument("Matrix dimensions must match for operation.");
+
+    Matrix<T> result(_rows, _cols);
+    for (int i = 0; i < _rows; ++i) {
+        for (int j = 0; j < _cols; ++j) {
+            result._data[i][j] = op(_data[i][j], other._data[i][j]);
+        }
+    }
+    return result;
+}
+
+template<typename T>
+Matrix<T>& Matrix<T>::operator=(std::initializer_list<std::initializer_list<T>> list) {
+    if (_rows != list.size() || _cols != list.begin()->size())
+        throw std::invalid_argument("Matrix dimensions must match for operation.");
+    _data = vec2(list.begin(), list.end());
+}
+
+template<typename T>
+Matrix<T>& Matrix<T>::operator=(const Matrix<T> other) {
+    return assignmentOperation(other, [](T& a, T b) { return a = b; });
+}
+
+template<typename T>
+Matrix<T> Matrix<T>::operator+(const Matrix<T>& other) const {
+    return binaryOperation(other, [](T a, T b) { return a + b; });
+}
+
+template<typename T>
+Matrix<T> Matrix<T>::operator-(const Matrix<T>& other) const {
+    return binaryOperation(other, [](T a, T b) { return a - b; });
+}
+
+
+template<typename T>
+Matrix<T>& Matrix<T>::operator+=(const Matrix<T> other) {
+    return assignmentOperation(other, [](T& a, T b) { return a += b; });
+}
+
+template<typename T>
+Matrix<T>& Matrix<T>::operator-=(const Matrix<T> other) {
+    return assignmentOperation(other, [](T& a, T b) { return a += b; });
 }

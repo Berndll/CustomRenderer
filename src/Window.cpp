@@ -249,23 +249,23 @@ void Window::drawPolygon(std::vector<std::pair<double, double>> points, uint32_t
     );
 }
 */
-void Window::drawPolygon(std::vector<Matrix2D<double>> points, uint32_t color) {
-    for (int i = 0; i < points.size() - 1; ++i) {
-        drawLine(
-            points.at(i).at(0,0),   points.at(i).at(1,0),
-            points.at(i+1).at(0,0), points.at(i+1).at(1,0),
-            color
-        );
-    }
-    drawLine(
-        points.at(0).at(0,0),  points.at(0).at(1,0),
-        points.back().at(0,0), points.back().at(1,0),
-        color
-    );
-}
+// void Window::drawPolygon(std::vector<Matrix2D<double>> points, uint32_t color) {
+//     for (int i = 0; i < points.size() - 1; ++i) {
+//         drawLine(
+//             points.at(i).at(0,0),   points.at(i).at(1,0),
+//             points.at(i+1).at(0,0), points.at(i+1).at(1,0),
+//             color
+//         );
+//     }
+//     drawLine(
+//         points.at(0).at(0,0),  points.at(0).at(1,0),
+//         points.back().at(0,0), points.back().at(1,0),
+//         color
+//     );
+// }
 
-void Window::drawPolygon(Matrix<double> points, uint32_t color) {
-    for (int i = 0; i < points.getRows() - 1; ++i)
-        drawLine(points.at(i), points.at(i + 1), color);
-    drawLine(points.at(0), points.at(points.getRows() -1), color);
-}
+// void Window::drawPolygon(Matrix<double> points, uint32_t color) {
+//     for (int i = 0; i < points.getRows() - 1; ++i)
+//         drawLine(points.at(i), points.at(i + 1), color);
+//     drawLine(points.at(0), points.at(points.getRows() -1), color);
+// }
